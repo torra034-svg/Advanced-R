@@ -1,0 +1,360 @@
+---
+title: "Assignment 3"
+subtitle: "PUBH 7462"
+author: "Student Name"
+format: 
+  html:
+    theme: zephyr
+    embed-resources: true
+execute:
+  include: true
+  echo: false
+  warning: false
+  message: false
+editor: visual
+---
+
+## Instructions
+
+In this assignment, you'll practice writing functions and doing iteration while building a system that automatically converts the coded ATUS data values into "friendly" labels using a data dictionary.
+
+As in previous assignments, there are no individual "questions" on this assignment, just a set of tasks to complete. If you complete the set of tasks, you will receive the full 50 points for the assignment. Partial credit will be awarded if you're unable to complete all of the tasks.
+
+## Task #1: Download files from Canvas
+
+## Task #2: Load the ATUS data and data dictionary
+
+You should create the `data` folder that contains two files:
+
+-   `atus_raw.csv` is the "raw" ATUS data. In this dataset, categorical variables use numerical codes, which are documented in the data dictionary.
+
+-   `atus_dictionary.csv` is a data file contains information about the variables in the ATUS dataset, derived from the original data dictionary (available in the `docs` folder as `atus_dictionary.doc`). This is an example of a "data dictionary as data", which as we'll see is a very useful concept as it will allow us to automate a lot of data processing.
+
+Load these files into R. The code below assumes you have the csv files inside a directory called `data` in the same working directory for R.
+
+```{r}
+library(tidyverse)
+#MODIFY if needed to change the filepaths
+atus <- read_csv("data/atus_raw.csv")
+atus_dict <- read_csv("data/atus_dictionary.csv")
+
+```
+
+## Task #3: Explore the data dictionary data
+
+After loading `atus_dictionary.csv`, spend a minute familiarizing yourself with its structure. You'll notice that it's in long format, with levels of categorical variables each getting their own row. The `type` column indicates whether the variable is `categorical` or `numeric`. `categorical` variables have entries in the `value` and `label` column; the `value` column gives the numeric code as found in `atus_raw.csv`, while the `label` column gives the "friendly" label corresponding to that numeric code. `numeric` variables have both `value` and `label` recorded as missing (`NA`). All variables in `atus_raw.csv` are documented *except the activity variables (starting with `ACT_`*)*.*
+
+**Aside:** A "data dictionary as data" intended for public consumption would ideally also a brief description of each variable as well. You can find these descriptions, if needed, in `atus_dictionary.doc` word document.
+
+Produce the following plot, which shows the distribution of number of levels for the categorical variables in the dataset:
+
+```{r}
+#| eval: false
+#MODIFY
+atus_dict %>% filter(type == "categorical") %>%
+  ggplot(data=., mapping=aes(y = ??)) + 
+# Continue Code for bargraph, when ready change chunk option to #| eval: true
+```
+
+::: {.callout-important icon="false"}
+## Optional Challenge
+
+Produce a version of the plot with the categories in order from most to least levels:
+
+```{r}
+#| eval: false
+#MODIFY (if doing optional challenge)
+atus_dict %>% filter(type == "??????") %>%
+  group_by(????) %>%
+  mutate(n_levels = n()) %>%
+  ungroup() %>%
+  mutate(variable = fct_reorder(????????)) %>%
+# put additional code here
+```
+:::
+
+## Task #4: Write a function to translate codes into friendly labels
+
+Write a function, `make_labels`, which has the following form:
+
+```{r}
+#| echo: true
+
+make_labels <- function(x, values, labels) {
+  # Your code here...
+}
+```
+
+The function's three arguments are:
+
+-   `x`, an input vector consisting of coded values
+
+-   `values` , the unique set of coded values that `x` could potentially take on
+
+-   `labels` , the labels corresponding to the entries in `values`
+
+The function should return a "friendly" version of `x`, i.e., a factor with the coded values in `x` replaced by the labeled values.
+
+```{r}
+#| eval: false
+#MODIFY
+make_labels <- function(x, values, labels) {
+  factor(???, levels = ????, labels = ???)
+}
+
+
+```
+
+For example, given a vector `make_labels` should produce the following:
+
+```{r}
+#| echo: true
+#MODIFY - uncomment 'make_labels' when finished
+x <- c(0, 0, 0, 1, 0, 1)
+values <- c(0, 1, 2)
+labels <- c("Male", "Female", "Prefer Not to Say")
+
+#make_labels(x, values, labels)
+
+```
+
+Test your function using the `GENHEALTH` variable from the ATUS dataset.
+
+## Task #5: Make `make_labels` more error-proof
+
+Improve the `make_labels` function by implementing the following checks (with helpful error messages):
+
+-   Produce an error if `values` and `labels` have different lengths
+
+-   Produce a warning if there are any values in `x` that do not appear in `values`. The warning should tell the user that these values will appear as missing (`NA`) in the output.
+
+## Task #6: Write a function to make labels for any variable in a data dictionary
+
+Now, suppose that we want to return the "friendly" labels for any column of a data frame that we specify by name. Write a function with the following signature:
+
+```{r}
+#| eval: false
+#| echo: true
+
+# MODIFY
+label_from_dict <- function(v_name, data, dict) {
+  # Your code here....
+}
+```
+
+The arguments are:
+
+-   `v_name`, the name of a variable
+
+-   `data`, the data frame (or tibble) that the variable appears in
+
+-   `dict`, a data dictionary structured the same way as the one you read in above
+
+```{r}
+label_from_dict <- function(v_name, data, dict) {
+  
+# code goes here
+}
+```
+
+Check that your function works by confirming that you get this output from the following code:
+
+```{r}
+#| echo: true
+#| eval: false
+
+income <- label_from_dict("FAMINCOME", atus, atus_dict)
+region <- label_from_dict("REGION", atus, atus_dict)
+table(income, region)
+
+```
+
+Write the `label_from_dict` function so that the "work" is done by a call to the `make_labels` function that you defined above.
+
+::: {.callout-important icon="false"}
+## Optional challenge
+
+The `label_from_dict` function assumes that the relevant columns of `dict` are named `variable`, `value`, and `label`. This isn't very generalizable. Write a version of the `label_from_dict` function which takes three additional arguments, `variable_var`, `value_var`, and `label_var`, which are each strings that give the name of the respective columns in `dict`. Set their default values to be "variable", "value", and "label" so that your new function will work in the rest of the assignment.
+
+HINT: The command `filter(!!sym(variable_var) == v_name)` will do exactly the same thing as `filter(variable == v_name)`; the same thing applies for `!!sym(value_var)` and `!!sym(label_var)`. See the code in the "My recommendation (& a bonus function!)" box at the end of the assignment for an example of how to use this syntax.
+
+```{r}
+#| eval: false
+label_from_dict <- function(v_name, data, dict, variable_var  = "variable", value_var = "value", label_var = "label") {
+  
+# code here
+}
+```
+
+Test your function by renaming the columns of `atus_dict` and running your new function on it.
+:::
+
+## Task #7: Improve `label_from_dict`
+
+Implement error checking by writing code that stops execution (with a useful error message) if:
+
+-   `v_name` doesn't appear in either `data` and `dict`
+
+-   `v_name` is not a categorical variable
+
+## Task #8: Apply `label_from_dict` to all the categorical variables in your dataset
+
+So you've got a function that operates on one column of a dataset, but you'd like to apply it to all the columns in the dataset that are categorical. Write *another* function, `label_all_from_dict`, which has the following form:
+
+```{r}
+#| eval: false
+
+label_all_from_dict <- function(data, dict) {
+  # Your code here...
+}
+
+```
+
+The arguments are:
+
+-   `data`, the data frame
+
+-   `dict`, the data dictionary
+
+The function `label_all_from_dict` should return a data frame (or tibble) with all the categorical variables having their coded values replaced by "friendly" ones pulled form the data dictionary.
+
+HINT: While you're not obligated to follow my approach for this problem, here's a rough sketch of how my `label_all_from_dict` function works:
+
+-   Create a vector, `cat_vars`, containing the names of the categorical variables from `dict`
+
+-   Use the `map_dfc` function to apply the `label_from_dict` function to `cat_vars`. The syntax I used is: `map_dfc(cat_vars, .f = label_from_dict, data = data, dict = dict)`
+
+    -   For more on the `map` family of functions, see the last part of the Week 4 lecture.
+
+-   Assign the correct column names to the result of the `map_dfc` command using the `colnames` function.
+
+-   Bind the resulting columns to the set of columns which were not modified by `label_from_dict`
+
+```{r}
+#| eval: false
+
+#MODIFY
+label_all_from_dict <- function(data, dict) {
+  cat_vars <- dict %>% filter(type == "??????") %>% 
+    distinct(????) %>% 
+    pull(?????)
+  
+  M <- map_dfc(cat_vars, .f = ????, data = ???, dict = ???)
+  colnames(M) <- cat_vars
+  
+  full_data <- M %>% 
+    bind_cols(data %>% dplyr::select(-all_of(????))) %>% 
+    select(all_of(colnames(???)))
+  
+  return(full_data)
+}
+
+labeled_df <- atus %>% label_all_from_dict(atus_dict)
+
+```
+
+::: {.callout-important icon="false"}
+## Optional challenges
+
+-   Add error checking to the `label_all_from_dict` function
+
+-   Implement the `variable_var`, `value_var`, and `label_var` arguments as above
+
+-   Return the columns of the output data frame in the same order as the original data frame
+:::
+
+## Task #9: Submit and reflect
+
+Submit your qmd file and html output to Canvas.
+
+Now, **take a step back to look at what you've done**: with a couple of dozen lines of code (hopefully), you've created a set of functions that can automatically add "friendly" labels to all the categorical variables of any dataset. Doing this manually would have take hundreds of lines! The only thing you need is a "data dictionary as data", i.e., a data file with the same layout as `atus_dictionary.csv` that maps the variable codes to labels.
+
+::: callout-note
+## Recommendation (& a bonus function!)
+
+If you have the opportunity to give input in the early stages of data collection, you should *advocate for the data dictionary to be constructed as a data file*, thereby allowing you to apply the type of code you developed here to make your data processing life much easier.
+
+A good data dictionary as data file brings other benefits, too. For example, the `type` column in the data dictionary allows you to write generic functions for doing things like creating summary tables and plots that operate differently depending on the data type.
+
+Consider the following code, which produces a different summary plot depending on whether the named variable is categorical or numeric. The code uses some fancy footwork (the `!!sym(v_name)` command) to convert the `v_name` string into a "naked" variable name, but otherwise is pretty straightforward.
+
+```{r}
+#| echo: true
+
+summary_plot <- function(v_name, data, dict) {
+  # Get the variable type
+  var_type <- dict %>% filter(variable == v_name) %>% pull(type) %>% first()
+  
+  # !!sym(vname) converts the string v_name into a variable name that
+  # ggplot knows how to deal with.
+  # For example, if v_name is the string "GENHEALTH", then
+  # aes(x = !!sym(v_name)) is like typing aes(x = GENHEALTH)
+  base_plot <- data %>% ggplot(aes(x = !!sym(v_name)))
+  
+  if(var_type == "categorical") {
+    # For categorical variables, make a bar plot
+    final_plot <- base_plot + geom_bar() 
+  } else {
+    # For numeric variables, make a density plot
+    final_plot <- base_plot + geom_density() 
+  }
+  
+  return(final_plot + ggtitle(paste("Summary plot of", v_name)))
+  
+}
+
+summary_plot("GENHEALTH", atus, atus_dict)
+summary_plot("BMI", atus, atus_dict)
+
+```
+:::
+
+::: callout-note
+## A bonus to the bonus
+
+Wouldn't it be cool if we could convert our `summary_plot` function to work in a dplyr pipeline, so that we could call it like this?
+
+```{r}
+#| echo: true
+#| eval: false
+
+atus %>% summary_plot(GENHEALTH, dict = atus_dict)
+atus %>% summary_plot(BMI, dict = atus_dict)
+
+```
+
+Turns out, you can! Here is the modified function, which involves just a little more fancy footwork.
+
+```{r}
+#| echo: true
+
+summary_plot <- function(data, v_name, dict) {
+  # Get the variable type
+  # We have to use rlang::as_name(v_name) to convert it to a string
+  v_name_str <- rlang::as_name(enquo(v_name))
+  
+  var_type <- dict %>% filter(variable == v_name_str) %>% pull(type) %>% first()
+  
+  # !!sym(vname) converts the string v_name into a variable name that
+  # ggplot knows how to deal with.
+  # For example, if v_name is the string "GENHEALTH", then
+  # aes(x = !!sym(v_name)) is like typing aes(x = GENHEALTH)
+  base_plot <- data %>% ggplot(aes(x = !!sym(v_name_str)) )
+  
+  if(var_type == "categorical") {
+    # For categorical variables, make a bar plot
+    final_plot <- base_plot + geom_bar() 
+  } else {
+    # For numeric variables, make a density plot
+    final_plot <- base_plot + geom_density() 
+  }
+  
+  return(final_plot + ggtitle(paste("Summary plot of", v_name_str)))
+  
+}
+
+atus %>% summary_plot(GENHEALTH, dict = atus_dict)
+atus %>% summary_plot(BMI, dict = atus_dict)
+
+```
+:::
