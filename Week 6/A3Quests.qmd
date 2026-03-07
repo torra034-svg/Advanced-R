@@ -32,7 +32,7 @@ You should create the `data` folder that contains two files:
 
 Load these files into R. The code below assumes you have the csv files inside a directory called `data` in the same working directory for R.
 
-```{r}
+```{r import ATUS data and dictionary}
 library(tidyverse)
 #MODIFY if needed to change the filepaths
 atus <- read_csv("data/atus_raw.csv")
@@ -122,7 +122,7 @@ x <- c(0, 0, 0, 1, 0, 1)
 values <- c(0, 1, 2)
 labels <- c("Male", "Female", "Prefer Not to Say")
 
-#make_labels(x, values, labels)
+make_labels(x, values, labels)
 
 ```
 
@@ -168,7 +168,6 @@ make_labels <- function(x, values, labels) {
 
 Now, suppose that we want to return the "friendly" labels for any column of a data frame that we specify by name. Write a function with the following signature:
 
-
 ```{r}
 #| eval: true
 #| echo: true
@@ -188,9 +187,14 @@ The arguments are:
 
 ```{r}
 label_from_dict <- function(v_name, data, dict) {
-  factor(v_name = v_name,
-         data = data,
-         dict = dict)
+  
+  v_dict <- dict[atus_dict$variable == v_name, ]
+  
+  raw_numbers <- data[[v_name]]
+  
+  factor(raw_numbers,
+         levels = v_dict$value,
+         labels = v_dict$label)
 }
 ```
 
@@ -198,15 +202,33 @@ Check that your function works by confirming that you get this output from the f
 
 ```{r}
 #| echo: true
-#| eval: false
+#| eval: TRUE
 
 income <- label_from_dict("FAMINCOME", atus, atus_dict)
+
 region <- label_from_dict("REGION", atus, atus_dict)
 table(income, region)
 
 ```
 
 Write the `label_from_dict` function so that the "work" is done by a call to the `make_labels` function that you defined above.
+
+```{r}
+
+label_from_dict <- function(v_name, data, dict) {
+  
+  v_dict <- dict[atus_dict$variable == v_name, ]
+  
+  raw_numbers <- data[[v_name]]
+  
+  make_labels(x = raw_numbers,
+              values = v_dict$value,
+              labels = v_dict$label)
+  
+  
+}
+
+```
 
 ::: {.callout-important icon="false"}
 ## Optional challenge
@@ -233,6 +255,34 @@ Implement error checking by writing code that stops execution (with a useful err
 -   `v_name` doesn't appear in either `data` and `dict`
 
 -   `v_name` is not a categorical variable
+
+```{r}
+
+label_from_dict <- function(v_name, data, dict) {
+  
+  if(!(v_name %in% names(data))) {
+    stop(paste("Error:", v_name, " not found in the data frame."))
+  }
+  
+  if(!(v_name %in% dict$variable)) {
+    stop(paste("Error:", v_name, " not found in the dictionary."))
+  }
+  
+  v_dict <- dict[dict$variable == v_name, ]
+  
+  if(nrow(v_dict) <= 1) {
+    stop(paste("Error:", v_name, "is not categorical variable"))
+  }
+  
+  raw_numbers <- data[[v_name]]
+  
+  make_labels(x = raw_numbers, 
+              values = v_dict$value, 
+              labels = v_dict$label)
+  
+}
+
+```
 
 ## Task #8: Apply `label_from_dict` to all the categorical variables in your dataset
 
@@ -268,20 +318,21 @@ HINT: While you're not obligated to follow my approach for this problem, here's 
 -   Bind the resulting columns to the set of columns which were not modified by `label_from_dict`
 
 ```{r}
-#| eval: false
+#| eval: TRUE
 
 #MODIFY
 label_all_from_dict <- function(data, dict) {
-  cat_vars <- dict %>% filter(type == "??????") %>% 
-    distinct(????) %>% 
-    pull(?????)
+  cat_vars <- dict %>% 
+    filter(type == "categorical") %>% 
+    distinct(variable) %>% 
+    pull(variable)
   
-  M <- map_dfc(cat_vars, .f = ????, data = ???, dict = ???)
+  M <- map_dfc(cat_vars, .f = label_from_dict, data = data, dict = dict)
   colnames(M) <- cat_vars
   
   full_data <- M %>% 
-    bind_cols(data %>% dplyr::select(-all_of(????))) %>% 
-    select(all_of(colnames(???)))
+    bind_cols(data %>% dplyr::select(-all_of(cat_vars))) %>% 
+    select(all_of(colnames(data)))
   
   return(full_data)
 }

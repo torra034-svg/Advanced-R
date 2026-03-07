@@ -1,0 +1,164 @@
+---
+title: "Week4 Activity"
+author: "Patrick Torralba"
+date: "2026-02-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Task 1
+```{r task 1}
+
+pretty_pvalue <- function(pval) {
+  if(pval < 0.001) {
+    pretty_pval <- "< 0.001"
+  } else {
+    pretty_pval <- round(pval, 3)
+  }
+  return(pretty_pval)
+}
+
+```
+
+
+```{r task 1 - input values}
+
+pretty_pvalue(0.07)
+pretty_pvalue(0.138921)
+pretty_pvalue(0.00003)
+pretty_pvalue(4e-7)
+
+```
+
+
+# Task 2
+```{r task 2 - updated function}
+
+pretty_pvalue <- function(pval, threshold) {
+  if(pval < threshold) {
+    pretty_pval <- paste("<", threshold)
+  } else {
+    pretty_pval <- round(pval, 3)
+  }
+  return(pretty_pval)
+}
+
+```
+
+
+```{r task 2 - input values}
+
+pretty_pvalue(0.05,0.05)
+pretty_pvalue(0.00001, 0.05)
+pretty_pvalue(0.83, 0.001)
+pretty_pvalue(0.00000000001,0.00001)
+
+```
+
+
+# Task 3
+
+```{r task 3 - default value}
+
+pretty_pvalue <- function(pval, threshold = 0.001) { # Note the change here
+  # Rest of the function stays the same
+  if(pval < threshold) {
+    pretty_pval <- paste("<", threshold)
+  } else {
+    pretty_pval <- round(pval, 3)
+  }
+  return(pretty_pval)
+}
+
+
+```
+
+
+```{r task 3input values}
+
+pretty_pvalue(0.00004)
+pretty_pvalue(0.73)
+```
+
+
+# Task 4
+```{r task 4 inputs}
+
+pretty_pvalue("hello")
+pretty_pvalue(NA)
+pretty_pvalue(-2)
+```
+
+
+```{r task 4 - inital checks}
+
+pretty_pvalue <- function(pval, threshold = 0.001) { # Note the change here
+ 
+  if(!is.numeric(pval)) {
+    stop("p-value is not numeric")
+  }
+  
+  if(pval < threshold) {
+    pretty_pval <- paste("<", threshold)
+  } else {
+    pretty_pval <- round(pval, 3)
+  }
+  return(pretty_pval)
+}
+
+
+```
+
+
+
+```{r task 4 - modification}
+
+pretty_pvalue <- function(pval, threshold = 0.001) { # Note the change here
+ 
+  if(!is.numeric(pval)) {
+    stop("p-value is not numeric")
+  }
+  
+  if(!is.numeric(threshold)) {
+    stop("threshold is not numeric")
+  }
+  
+  if(pval > 1) {
+    stop("p-value is greater than 1")
+  }
+  
+  if(pval < 0) {
+    stop("p-value is less than 0")
+  }
+  
+  if(is.na(pval)) {
+    message("pval is NA")
+  }
+  
+  if(is.na(threshold)) {
+    message("threshold is NA")
+  }
+  
+  if(pval < threshold) {
+    pretty_pval <- paste("<", threshold)
+  } else {
+    pretty_pval <- round(pval, 3)
+  }
+  return(pretty_pval)
+}
+```
+
+```{r task 4 inputs}
+
+pretty_pvalue(NA)
+pretty_pvalue(-5)
+pretty_pvalue(3)
+pretty_pvalue(0.05, NA)
+pretty_pvalue(0.04, 0.05)
+pretty_pvalue("abs")
+pretty_pvalue(0.03,"sdfg")
+```
+

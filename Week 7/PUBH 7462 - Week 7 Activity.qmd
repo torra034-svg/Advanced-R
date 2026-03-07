@@ -1,0 +1,131 @@
+---
+title: "PUBH 7462 - Week 7 Activity"
+author: "Patrick Torralba"
+format: html
+editor: visual
+---
+
+```{r library + load data}
+
+library(tidyverse)
+library(lubridate)
+library(janeaustenr)
+library(knitr) # needed for kable function
+
+data("prideprejudice")
+
+head(prideprejudice, 10) # some stuff at beginning to remove
+
+```
+
+# Working with Strings
+```{r}
+tail(prideprejudice) # end looks fine!
+
+```
+
+```{r}
+pandp.words <- prideprejudice[prideprejudice != ""]
+pandp.words <- pandp.words[-c(1,2)]
+```
+
+```{r str_subset}
+
+pandp.words <- pandp.words %>%
+  str_subset("Chapter \\d+", negate = TRUE)
+```
+
+```{r str_remove_all}
+
+pandp.words.only <- pandp.words %>% 
+  str_remove_all("[.!,;:?\"\\'_]")
+
+```
+
+```{r tolower}
+
+pandp.words.only <- pandp.words.only %>% 
+  tolower()
+
+head(pandp.words.only, 10)
+```
+
+```{r pandp}
+
+pandp <- pandp.words.only %>% 
+  str_split(" ")
+
+head(pandp, 25)
+
+```
+
+```{r str_glue}
+
+pride_count <- sum(str_count(pandp, "pride"))
+
+prejudice_count <- sum(str_count(pandp, "prejudice"))
+
+str_glue("The word 'pride' appears {pride_count} times and the word 'prejudice' appears {prejudice_count} times.")
+
+```
+
+# The date/time format is snow joke!
+```{r import precip}
+
+precip <- read.csv("mn_precip.csv")
+
+head(precip)
+```
+
+```{r change variables from character to appropriate format}
+glimpse(precip)
+
+precip <- precip %>% 
+  mutate(date = mdy(date),
+         precip.in = if_else(precip.in == "T", "0.005", precip.in),
+         snow.in = if_else(snow.in == "T", "0.005", snow.in),
+         snowdepth.in = if_else(snowdepth.in == "T", "0.005", snowdepth.in)) %>% 
+  mutate(across(is.character, as.numeric))
+
+glimpse(precip)
+```
+
+```{r daily snowfall plot}
+ggplot(precip, aes(x = date, y = snow.in)) +
+  geom_line(color = "skyblue") +
+  labs(x = "Date",
+       y = "Snowfall (inches)",
+       title = "Daily Snowfall in the Twin Cities")
+
+
+```
+
+
+```{r snow table}
+
+snow_table <- precip %>% 
+  filter(month(date) %in% c(11, 12, 1:3)) %>% 
+  group_by(year(date)) %>% 
+  summarize("snow_fall" = sum(snow.in),
+            "snow_day" = sum(snow.in >= 0.01)) %>%
+  kable(col.names = c("Year", "Snowfall (inches)", "Snow Days"), align = 'c')
+  
+snow_table
+```
+
+```{r Yearly min tem}
+
+precip %>%
+filter(year(date) %in% 2016:2024) %>% #Decade data
+  mutate(Year = as.factor(year(date))) %>% 
+ggplot(aes(x = Year, y = mintemp.f, fill = Year)) +
+  geom_boxplot(alpha = 0.5) +
+  labs(x = " ",
+       y = "Minimum Temperature (F)",
+       title = "Minimum Temperature (F) from 2016 to 2024") +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+
+```
+
