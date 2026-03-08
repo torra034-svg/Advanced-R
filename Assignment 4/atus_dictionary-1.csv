@@ -1,0 +1,195 @@
+variable,type,value,label
+REGION,categorical,1,Northeast
+REGION,categorical,2,Midwest
+REGION,categorical,3,South
+REGION,categorical,4,West
+METRO,categorical,1,"Metropolitan, central city"
+METRO,categorical,2,"Metropolitan, balance of MSA"
+METRO,categorical,3,"Metropolitan, not identified"
+METRO,categorical,4,Nonmetropolitan
+METRO,categorical,5,Not identified
+MSASIZE,categorical,0,Not identified or non-metropolitan
+MSASIZE,categorical,2,"100,000 - 249,999"
+MSASIZE,categorical,3,"250,000 - 499,999"
+MSASIZE,categorical,4,"500,000 - 999,999"
+MSASIZE,categorical,5,"1,000,000 - 2,499,999"
+MSASIZE,categorical,6,"2,500,000 - 4,999,999"
+MSASIZE,categorical,7,"5,000,000+"
+HH_SIZE,numeric,,1
+FAMINCOME,categorical,1,"Less than $5,000"
+FAMINCOME,categorical,2,"$5,000 to $7,499"
+FAMINCOME,categorical,3,"$7,500 to $9,999"
+FAMINCOME,categorical,4,"$10,000 to $12,499"
+FAMINCOME,categorical,5,"$12,500 to $14,999"
+FAMINCOME,categorical,6,"$15,000 to $19,999"
+FAMINCOME,categorical,7,"$20,000 to $24,999"
+FAMINCOME,categorical,8,"$25,000 to $29,999"
+FAMINCOME,categorical,9,"$30,000 to $34,999"
+FAMINCOME,categorical,10,"$35,000 to $39,999"
+FAMINCOME,categorical,11,"$40,000 to $49,999"
+FAMINCOME,categorical,12,"$50,000 to $59,999"
+FAMINCOME,categorical,13,"$60,000 to $74,999"
+FAMINCOME,categorical,14,"$75,000 to $99,999"
+FAMINCOME,categorical,15,"$100,000 to $149,999"
+FAMINCOME,categorical,16,"$150,000 and over"
+FAMINCOME,categorical,996,Refused
+FAMINCOME,categorical,997,Don't know
+FAMINCOME,categorical,998,Blank
+HH_NUMKIDS,numeric,,
+HOUSETYPE,categorical,1,"House, apartment, flat"
+HOUSETYPE,categorical,2,"Housing unit in nontransient hotel, motel, etc."
+HOUSETYPE,categorical,3,"Housing unit permanent in transient hotel, motel"
+HOUSETYPE,categorical,4,Housing unit in rooming house
+HOUSETYPE,categorical,5,Mobile home or trailer with no permanent room added
+HOUSETYPE,categorical,6,Mobile home or trailer with 1 or more rooms added
+HOUSETYPE,categorical,7,Housing unit not specified above
+HOUSETYPE,categorical,8,Quarters not housing unit in rooming boarding house
+HOUSETYPE,categorical,9,"Unit not permanent, in transient hotel or motel"
+HOUSETYPE,categorical,10,Unoccupied tent site or trailer site
+HOUSETYPE,categorical,11,Student quarters in college dorm
+HOUSETYPE,categorical,12,Other unit not specified above
+AGEYCHILD,numeric,,
+HH_NUMADULTS,numeric,,
+AGE,numeric,,
+SEX,categorical,1,Male
+SEX,categorical,2,Female
+SEX,categorical,99,NIU (Not in universe)
+RACE,categorical,100,White only
+RACE,categorical,110,Black only
+RACE,categorical,120,"American Indian, Alaskan Native"
+RACE,categorical,130,Asian or Pacific Islander
+RACE,categorical,131,Asian only
+RACE,categorical,132,Hawaiian Pacific Islander only
+RACE,categorical,200,White-Black
+RACE,categorical,201,White-American Indian
+RACE,categorical,202,White-Asian
+RACE,categorical,203,White-Hawaiian
+RACE,categorical,210,Black-American Indian
+RACE,categorical,211,Black-Asian
+RACE,categorical,212,Black-Hawaiian
+RACE,categorical,220,American Indian-Asian
+RACE,categorical,221,American Indian-Hawaiian
+RACE,categorical,230,Asian-Hawaiian
+RACE,categorical,300,White-Black-American Indian
+RACE,categorical,301,White-Black-Asian
+RACE,categorical,302,White-Black-Hawaiian
+RACE,categorical,310,White-American Indian-Asian
+RACE,categorical,311,White-American Indian-Hawaiian
+RACE,categorical,320,White-Asian-Hawaiian
+RACE,categorical,330,Black-American Indian-Asian
+RACE,categorical,331,Black-American Indian-Hawaiian
+RACE,categorical,340,Black-Asian-Hawaiian
+RACE,categorical,350,American Indian-Asian-Hawaiian
+RACE,categorical,398,Other 3 race combinations
+RACE,categorical,399,"2 or 3 races, unspecified"
+RACE,categorical,400,White-Black-American Indian-Asian
+RACE,categorical,401,White-Black-American Indian-Hawaiian
+RACE,categorical,402,White-Black-Asian-Hawaiian
+RACE,categorical,403,Black-American Indian-Asian-Hawaiian
+RACE,categorical,404,White-American Indian-Asian-Hawaiian
+RACE,categorical,500,White-Black-American Indian-Asian-Hawaiian
+RACE,categorical,599,"4 or 5 races, unspecified"
+RACE,categorical,9999,NIU (Not in universe)
+HISPAN,categorical,100,Not Hispanic
+HISPAN,categorical,210,Mexican
+HISPAN,categorical,211,Mexican American
+HISPAN,categorical,212,Chicano
+HISPAN,categorical,213,Mexcian (Mexicano)
+HISPAN,categorical,220,Puerto Rican
+HISPAN,categorical,230,Cuban
+HISPAN,categorical,240,Central-South American
+HISPAN,categorical,241,Dominican
+HISPAN,categorical,242,Salvadoran
+HISPAN,categorical,243,Other Central American
+HISPAN,categorical,244,South American
+HISPAN,categorical,250,Other Spanish
+HISPAN,categorical,9999,NIU (Not in universe)
+GENHEALTH,categorical,1,Excellent
+GENHEALTH,categorical,2,Very good
+GENHEALTH,categorical,3,Good
+GENHEALTH,categorical,4,Fair
+GENHEALTH,categorical,5,Poor
+GENHEALTH,categorical,96,Refused
+GENHEALTH,categorical,97,Don't know
+GENHEALTH,categorical,99,NIU (Not in universe)
+BMI,numeric,,
+EDUC,categorical,10,Less than 1st grade
+EDUC,categorical,11,"1st, 2nd, 3rd, or 4th grade"
+EDUC,categorical,12,5th or 6th grade
+EDUC,categorical,13,7th or 8th grade
+EDUC,categorical,14,9th grade
+EDUC,categorical,15,10th grade
+EDUC,categorical,16,11th grade
+EDUC,categorical,17,12th grade - no diploma
+EDUC,categorical,20,High school graduate - GED
+EDUC,categorical,21,High school graduate - diploma
+EDUC,categorical,30,Some college but no degree
+EDUC,categorical,31,Associate degree - occupational vocational
+EDUC,categorical,32,Associate degree - academic program
+EDUC,categorical,40,"Bachelor's degree (BA, AB, BS, etc.)"
+EDUC,categorical,41,"Master's degree (MA, MS, MEng, MEd, MSW, etc.)"
+EDUC,categorical,42,"Professional school degree (MD, DDS, DVM, etc.)"
+EDUC,categorical,43,"Doctoral degree (PhD, EdD, etc.)"
+EDUC,categorical,999,NIU (Not in universe)
+EDUCYRS,categorical,100,Grades 1-12
+EDUCYRS,categorical,101,Less than first grade
+EDUCYRS,categorical,102,First through fourth grade
+EDUCYRS,categorical,105,Fifth through sixth grade
+EDUCYRS,categorical,107,Seventh through eighth grade
+EDUCYRS,categorical,109,Ninth grade
+EDUCYRS,categorical,110,Tenth grade
+EDUCYRS,categorical,111,Eleventh grade
+EDUCYRS,categorical,112,Twelfth grade
+EDUCYRS,categorical,200,College
+EDUCYRS,categorical,213,College--one year
+EDUCYRS,categorical,214,College--two years
+EDUCYRS,categorical,215,College--three years
+EDUCYRS,categorical,216,College--four years
+EDUCYRS,categorical,217,Bachelor's degree
+EDUCYRS,categorical,300,Advanced degree
+EDUCYRS,categorical,316,Master's degree
+EDUCYRS,categorical,317,Master's degree--one year program
+EDUCYRS,categorical,318,Master's degree--two year program
+EDUCYRS,categorical,319,Master's degree--three+ year program
+EDUCYRS,categorical,320,Professional degree
+EDUCYRS,categorical,321,Doctoral degree
+EDUCYRS,categorical,999,NIU (Not in universe)
+SCHLCOLL,categorical,1,Not enrolled
+SCHLCOLL,categorical,2,High school part time
+SCHLCOLL,categorical,3,High school full time
+SCHLCOLL,categorical,4,College/university part time
+SCHLCOLL,categorical,5,College/university full time
+SCHLCOLL,categorical,96,Refused
+SCHLCOLL,categorical,99,NIU (Not in universe)
+FULLPART,categorical,1,Full time
+FULLPART,categorical,2,Part time
+FULLPART,categorical,99,NIU (Not in universe)
+UHRSWORKT,numeric,,
+PED,numeric,,
+SED_EAT,numeric,,
+FOODSHOP,categorical,1,Yes
+FOODSHOP,categorical,2,No
+FOODSHOP,categorical,3,Split equally with other HH member(s)
+FOODSHOP,categorical,96,Refused
+FOODSHOP,categorical,97,Don't know
+FOODSHOP,categorical,99,NIU (Not in universe)
+SODA,categorical,1,Yes
+SODA,categorical,2,No
+SODA,categorical,97,Don't Know
+SODA,categorical,99,NIU
+STORE,categorical,1,Grocery store
+STORE,categorical,2,Supercenter
+STORE,categorical,3,Warehouse club
+STORE,categorical,4,Drugstore or convenience store
+STORE,categorical,5,Some other place
+STORE,categorical,96,Refused
+STORE,categorical,97,Don't know
+STORE,categorical,99,NIU
+EXFREQ,numeric,,
+FASTFDFREQ,numeric,,
+ENOUGHFD,categorical,1,Enough to eat
+ENOUGHFD,categorical,2,Sometimes not enough to eat
+ENOUGHFD,categorical,3,Often not enough to eat
+ENOUGHFD,categorical,96,Refused
+ENOUGHFD,categorical,97,Don't Know
+ENOUGHFD,categorical,99,NIU
