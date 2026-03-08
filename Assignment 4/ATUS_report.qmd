@@ -29,7 +29,6 @@ showtext_auto()
 library(gtsummary) # for table
 library(gt)
 library(knitr)
-library(kableExtra)
 ```
 
 ## Question
@@ -71,9 +70,7 @@ sleep %>%
   kable(
     col.names = c("Age Group (Years)", "Average", "Median", "SD"),
     align = "lccc", 
-    digits = 1) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
-  add_header_above(c(" " = 1, "Daily Sleep Summary (Hours)" = 3))
+    digits = 1)
 ```
 
 ```{r}
