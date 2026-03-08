@@ -2,7 +2,6 @@
 title: "Assignment 4"
 subtitle: "PUBH 7462 - Assignment 4"
 author: "Patrick Torralba"
-  - Student Name
 format: 
   html:
     theme: zephyr
@@ -27,8 +26,11 @@ atus <- read.csv("atus_raw-1.csv")
 library(tidyverse)
 library(showtext) # for ggplot
 showtext_auto()
+library(gtsummary) # for table
+library(gt)
+library(knitr)
+library(kableExtra)
 ```
-
 
 ## Question
 
@@ -36,13 +38,11 @@ How does the amount of time spent sleeping per day vary by age group?
 
 ## Methods
 
-I created a table to show the mean, median, and standard deviation of the number of hours spent on sleeping for different age groups. 
+I created a table to show the mean, median, and standard deviation of the number of hours spent on sleeping for different age groups.
 
-And, I also created a simple bar graph that shows the average sleeping hours by age group. 
-
+And, I also created a simple bar graph that shows the average sleeping hours by age group.
 
 ## Results
-
 
 ```{r data cleaning}
 sleep <- atus %>% 
@@ -57,16 +57,33 @@ sleep <- atus %>%
          sleep_hours = round(ACT_SLEEPING / 60,1)) %>% 
   group_by(age_group) %>% 
   summarize(avg_sleep_hours = round(mean(sleep_hours, na.rm = TRUE),1),
+            median_sleep_hours = round(median(sleep_hours, na.rm = TRUE),1),
             st.dev_sleep_hours = round(sd(sleep_hours, na.rm = TRUE),1))
 
 ```
 
-```{r sleep visualization}
+```{r}
+#| label: tbl-sleep 
+#| tbl-cap: "Daily Sleep Summary"
+
+sleep %>%
+  kable(
+    col.names = c("Age Group (Years)", "Average", "Median", "SD"),
+    align = "lccc", 
+    digits = 1,
+    format = "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+  add_header_above(c(" " = 1, "Daily Sleep Summary (Hours)" = 3))
+```
+
+```{r}
+#| label: fig-sleep 
+#| fig-cap: "Average Sleep (Hours) by Age Group"
 
 ggplot(sleep, aes(x = age_group, y = avg_sleep_hours, fill = age_group)) +
   geom_col() +
   geom_text(aes(label = round(avg_sleep_hours, 1)),
-            hjust = 1.2,
+            hjust = -1.2,
             color = "black",
             fontface = "bold") +
   labs(x = NULL,
@@ -84,5 +101,8 @@ ggplot(sleep, aes(x = age_group, y = avg_sleep_hours, fill = age_group)) +
 
 ```
 
+The group with the highest and lowest daily sleep hours are `r sleep$age_group[which.max(sleep$avg_sleep_hours)]` year olds and `r sleep$age_group[which.min(sleep$avg_sleep_hours)]` year olds, respectively. @fig-sleep
+
+The median didn't vary too far from the mean, and the standard deviation for all groups is between 2.1-2.5 hours. @tbl-sleep
 
 ## Discussion
