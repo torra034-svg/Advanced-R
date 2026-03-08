@@ -3,9 +3,9 @@ title: "Assignment 4"
 subtitle: "PUBH 7462 - Assignment 4"
 author: "Patrick Torralba"
 format: 
-  html:
-    theme: zephyr
+  pdf:
     embed-resources: true
+    prefer-html: true
 execute: 
   echo: false
   message: false
@@ -71,8 +71,7 @@ sleep %>%
   kable(
     col.names = c("Age Group (Years)", "Average", "Median", "SD"),
     align = "lccc", 
-    digits = 1,
-    format = "html") %>%
+    digits = 1) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
   add_header_above(c(" " = 1, "Daily Sleep Summary (Hours)" = 3))
 ```
@@ -116,4 +115,5 @@ The median didn't vary too far from the mean, and the standard deviation for all
 ::: {.callout-important}
 
 There are some limitations to this analysis. For example, babies and infants were grouped in the 1-17 age-group. This is a limitation because since babies and infants sleep more often than older children and adolescents, they can skew the average. Another limitation is that statistical significance was not tested. Therefore, it is unknown if the average sleeping hours by age-group is actually meaningful.
+
 :::
