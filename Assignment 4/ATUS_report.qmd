@@ -15,14 +15,14 @@ editor: visual
 
 ## Introduction
 
-```{r load atus_functions + data}
+```{r load atus_functions + data, echo=FALSE}
 source("atus_functions.R")
 
 atus <- read.csv("atus_raw-1.csv")
 
 ```
 
-```{r library}
+```{r library, echo=FALSE}
 library(tidyverse)
 library(showtext) # for ggplot
 showtext_auto()
@@ -44,7 +44,7 @@ And, I also created a simple bar graph that shows the average sleeping hours by 
 
 ## Results
 
-```{r data cleaning}
+```{r data cleaning, echo=FALSE}
 sleep <- atus %>% 
   select(AGE, ACT_SLEEPING) %>% 
   mutate(age_group = case_when(AGE < 18 ~ "1-17",
@@ -65,6 +65,7 @@ sleep <- atus %>%
 ```{r}
 #| label: tbl-sleep 
 #| tbl-cap: "Daily Sleep Summary"
+#| echo: FALSE
 
 sleep %>%
   kable(
@@ -79,6 +80,7 @@ sleep %>%
 ```{r}
 #| label: fig-sleep 
 #| fig-cap: "Average Sleep (Hours) by Age Group"
+#| echo: FALSE
 
 ggplot(sleep, aes(x = age_group, y = avg_sleep_hours, fill = age_group)) +
   geom_col() +
@@ -106,3 +108,12 @@ The group with the highest and lowest daily sleep hours are `r sleep$age_group[w
 The median didn't vary too far from the mean, and the standard deviation for all groups is between 2.1-2.5 hours. @tbl-sleep
 
 ## Discussion
+
+* 1-17 year age-group has the highest average daily sleep hours
+* 40-59 year age-group has the lowest average daily sleep hours
+* Average and median values are roughly similar
+
+::: {.callout-important}
+
+There are some limitations to this analysis. For example, babies and infants were grouped in the 1-17 age-group. This is a limitation because since babies and infants sleep more often than older children and adolescents, they can skew the average. Another limitation is that statistical significance was not tested. Therefore, it is unknown if the average sleeping hours by age-group is actually meaningful.
+:::
