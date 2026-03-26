@@ -1,0 +1,87 @@
+---
+title: "Mapping Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: scroll
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### New York Households
+
+```{r}
+library(janitor) # we can use this to clean column names!
+library(sf)
+us_counties.df <- st_read("USA_Counties.shp", quiet = TRUE) %>% janitor::clean_names()
+
+library(tidyverse)
+library(plotly)
+
+ny_hh.plot <- us_counties.df %>% 
+  filter(state_name %in% "New York") %>% 
+  mutate(
+    text_label = str_c(name, "\nHouseholds: ", round(households / 1000, 0), " K") # making label for hover
+  ) %>%
+  ggplot() + 
+  geom_sf(aes(fill = households/1000, text = text_label), colour = 'black', size = 0.8, alpha = 0.6) + 
+  labs(title = "Households in New York") + 
+  scale_fill_viridis_c("Households (1000s)", option = "B") + 
+  theme_void()
+
+ggplotly(ny_hh.plot, tooltip = 'text') %>% style(hoveron = 'fills')
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Illinois Agriculture
+
+```{r}
+il_farm.plot <- us_counties.df %>%
+  filter(state_name %in% "Illinois") %>%
+  mutate(
+    text_label = str_c(name, "\nAcreage: ", round(crop_acr17 / 1000, 0), " K") # making label for hover
+  ) %>%
+  ggplot() +
+  geom_sf(aes(fill = crop_acr17/1000, text = text_label),
+          colour = "black", size = 0.8, alpha = 0.6) + # thickens and darkens border
+  labs(
+    title = "2017 Census of Agriculture Acreage Estimates, IL"
+  ) +
+  scale_fill_viridis_c("Acreage (1000s)", option = "A") +
+  theme_void() # removes axes and labels
+
+# Use plotly to add hover!
+
+ggplotly(il_farm.plot, tooltip = 'text') %>% style(hoveron = 'fills')
+```
+
+### Minnesota Population
+
+```{r}
+minn_pop.plot <- us_counties.df %>%
+  filter(state_name %in% "Minnesota") %>%
+  mutate(
+    text_label = str_c(name, "\nPopulation: ", round(pop2010 / 1000, 0), " K") # making label for hover
+  ) %>%
+  ggplot() +
+  geom_sf(aes(fill = log(pop2010), text = text_label),
+          colour = "black", size = 0.8, alpha = 0.6) + # thickens and darkens border
+  labs(
+    title = "2010 US Census Population Estimates for MN Counties"
+  ) +
+  scale_fill_viridis_c("2010 Population (log)", option = "C") +
+  theme_void() # removes axes and labels
+
+# Use plotly to add hover!
+
+ggplotly(minn_pop.plot, tooltip = 'text') %>% style(hoveron = 'fills')
+```
+
