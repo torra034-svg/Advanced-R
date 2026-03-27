@@ -1,0 +1,64 @@
+---
+title: "Collaborative Data Activity W9"
+author: "Patrick Torralba"
+format: html
+editor: visual
+---
+
+# Task 1
+
+## Load library
+```{r}
+#| label: library
+
+library(tidyverse)
+library(googlesheets4)
+library(googledrive)
+
+gs4_auth(email = "Torra034@umn.edu1")
+
+```
+
+# Task 2
+```{r}
+#| label: task2
+
+target_sheet_id <- "https://docs.google.com/spreadsheets/d/1EBi9RXrkVpwv6fcaDeWTL5usaDVri_qrU6X-pkMihGU/edit?usp=sharing"
+
+# 2. Create your entry
+my_contribution <- tibble(
+  name = "Patrick Torralba",
+  random_number = 67, #Replace with your own 'random' number between 1 and 100
+  favorite_color = "red",
+  favorite_r_pkg = "broom" #replace with your favorite R package!
+)
+
+sheet_append(target_sheet_id, my_contribution)
+
+
+```
+
+# Task 3
+```{r}
+#| label: read-live-data
+
+class_data <- read_sheet(target_sheet_id)
+
+head(class_data)
+
+
+```
+
+
+```{r}
+#| label: fig-bar-class-data
+#| fig-cap: "Class Data Visualization"
+#| fig-cap-location: top
+
+ggplot(class_data, aes(x = Color)) +
+  geom_bar() +
+  labs(y = "Count",
+       title = " PUBH 7462: Favorite Color Distribution")
+
+```
+
