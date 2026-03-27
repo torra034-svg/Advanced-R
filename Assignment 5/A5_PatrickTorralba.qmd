@@ -4,3 +4,36 @@ author: "Patrick Torralba"
 format: html
 editor: visual
 ---
+
+```{r}
+#| label: library
+#| echo: false
+#| warning: false
+#| message: false
+
+library(tidyverse)
+library(sf)
+
+```
+
+```{r}
+#| label: load counties
+#| echo: false
+#| warning: false
+#| message: false
+
+us_counties.df <- st_read("USA_Counties/USA_Counties.shp") %>% janitor::clean_names()
+
+```
+
+
+
+# Task 1: USA Counties Data
+
+```{r}
+#| label: fig-KN-counties
+#| fig-cap: "Kansas Counties"
+
+
+```
+
