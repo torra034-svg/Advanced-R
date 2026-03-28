@@ -14,6 +14,7 @@ editor: visual
 library(tidyverse)
 library(sf)
 library(plotly)
+library(tidycensus)
 
 ```
 
@@ -82,13 +83,77 @@ ggplotly(ks_asian_pop.plot, tooltip = 'text') %>%
 
 # Task 2: Census Data
 
-## Kansas Census Map
+## New York Census Map
+
 ```{r}
-#| label: fig-KS-counties-median-age
-#| fig-cap: "Kansas "
+#| label: NY-males-df-clean
+
+
+NY_males.df <- get_acs(
+  geography = "tract",
+  variables = "B01001_002", # code for males
+  state = "NY",
+  county = "Kings",
+  year = 2023,
+  geometry = TRUE,
+  cb = FALSE
+)
+
+options(tigris_use_cache = TRUE)
+
+head(NY_males.df)
+
+```
+
+```{r}
+#| label: NY-males-df-ploty
+
+NY_males_plotly.df <- NY_males.df %>% 
+  mutate(
+    tract = str_split(NAME, ",") %>% 
+            map_chr(1) %>% 
+            str_remove("Census Tract "),
+    text_label = str_c(
+                        tract,
+                        "<br>",
+                        "\nMale Population: ",
+                        format(estimate, big.mark = ",")
+    ))
+
+
+```
+
+
+
+```{r}
+#| label: fig-NY-counties-male-pop
+#| fig-cap: "New York counties male pop"
 #| fig-cap-location: "top"
+
+male.gg <- ggplot() +
+  geom_sf(data = NY_males_plotly.df, aes(fill = estimate, text = text_label)) +
+  labs(title = "King County 2023 ACS Estimated Male Population") +
+  theme_void() +
+  scale_fill_viridis_c("Male Population", option = "C")
+
+
+male.gg
+```
+
+```{r}
+#| label: fig-male-pop-hover-plotly
+#| fig-cap: "King County Male Population"
+#| fig-cap-location: "top"
+
+ggplotly(male.gg,
+         tooltip = "text",
+         height = 600,
+         width = 800) %>% 
+  style(hoveron = "fills")
 
 
 
 ```
+
+
 
