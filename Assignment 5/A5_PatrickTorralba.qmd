@@ -37,9 +37,12 @@ us_counties.df <- st_read("USA_Counties/USA_Counties.shp") %>% janitor::clean_na
 
 ks_u5_pop.plot <- us_counties.df %>% 
   filter(state_name == "Kansas") %>% 
+  mutate(
+    text_label = str_c(name , "\nPopulation: ", round(age_under5 / 1000,0),"K") # hover label
+        ) %>%
   ggplot() +
   geom_sf(aes(fill = log(age_under5),
-              text = name)) +
+              text = text_label)) +
   labs(title = "Age Under 5 Population Estimate for KS Counties") +
   scale_fill_viridis_c("Age Under 5 (log)", option = "C") +
   theme(legend.position = "right") +
@@ -60,10 +63,13 @@ ggplotly(ks_u5_pop.plot, tooltip = 'text') %>%
 
 ks_asian_pop.plot <- us_counties.df %>% 
   filter(state_name == "Kansas") %>% 
+  mutate(
+    text_label = str_c(name , "\nPopulation: ", round(asian / 1000,0),"K") # hover label
+        ) %>%
   ggplot() +
   geom_sf(aes(fill = log(asian),
-              text = name)) +
-  labs(title = "Asian Population Estimate for K Counties") +
+              text = text_label)) +
+  labs(title = "Asian Population Estimate for KS Counties") +
   scale_fill_viridis_b("Asian (log)", option = "D") +
   theme(legend.position = "right") +
   theme_void()
@@ -72,3 +78,17 @@ ggplotly(ks_asian_pop.plot, tooltip = 'text') %>%
   style(hoveron = 'fills')
 
 ```
+
+
+# Task 2: Census Data
+
+## Kansas Census Map
+```{r}
+#| label: fig-KS-counties-median-age
+#| fig-cap: "Kansas "
+#| fig-cap-location: "top"
+
+
+
+```
+
