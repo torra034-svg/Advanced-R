@@ -29,23 +29,46 @@ us_counties.df <- st_read("USA_Counties/USA_Counties.shp") %>% janitor::clean_na
 
 # Task 1: USA Counties Data
 
-```{r}
-#| label: fig-KN-counties-under5
-#| fig-cap: "Age Under 5 Population Estimate for KN Counties"
+## Plotting Kansas Counties by Age Under 5 Population
 
-us_counties.df %>% 
+```{r}
+#| label: fig-ks-counties-under5
+#| fig-cap: "Age Under 5 Population Estimate for KS Counties"
+
+ks_u5_pop.plot <- us_counties.df %>% 
   filter(state_name == "Kansas") %>% 
   ggplot() +
-  geom_sf(aes(fill = log(age_under5))) +
-  labs(title = "Age Under 5 Population Estimate for KN Counties") +
+  geom_sf(aes(fill = log(age_under5),
+              text = name)) +
+  labs(title = "Age Under 5 Population Estimate for KS Counties") +
   scale_fill_viridis_c("Age Under 5 (log)", option = "C") +
-  theme(legend.position = "right")
-  
+  theme(legend.position = "right") +
+  theme_void()
+
+ggplotly(ks_u5_pop.plot, tooltip = 'text') %>% 
+  style(hoveron = 'fills')
 
 ```
 
+## Plotting Kansas Counties by Asian Population
 
 ```{r}
+#| label: fig-ks-counties-Asian
+#| fig-cap: "Asian Population Estimate for Ks Counties"
+#| fig-cap-location: "top"
+
+
+ks_asian_pop.plot <- us_counties.df %>% 
+  filter(state_name == "Kansas") %>% 
+  ggplot() +
+  geom_sf(aes(fill = log(asian),
+              text = name)) +
+  labs(title = "Asian Population Estimate for K Counties") +
+  scale_fill_viridis_b("Asian (log)", option = "D") +
+  theme(legend.position = "right") +
+  theme_void()
+
+ggplotly(ks_asian_pop.plot, tooltip = 'text') %>% 
+  style(hoveron = 'fills')
 
 ```
-
