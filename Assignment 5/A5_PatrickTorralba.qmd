@@ -15,6 +15,10 @@ library(tidyverse)
 library(sf)
 library(plotly)
 library(tidycensus)
+library(osmdata)
+library(ggmap)
+library(leaflet)
+library(virdis, quietly = TRUE)
 
 ```
 
@@ -156,4 +160,82 @@ ggplotly(male.gg,
 ```
 
 
+# Task 3: OpenStreetMap and Leaflet
+```{r}
+#| label: st-paul
+
+st_paul <- getbb("St.Paul")
+
+st_paul
+
+```
+
+```{r}
+#| label: st-paul-restaurant
+
+st_paul_restaurant_sf.df <- st_paul %>% 
+  opq %>% 
+  add_osm_feature(key = "amenity",
+                  value = "restaurant") %>% 
+  osmdata_sf()
+
+#Extract sf data frame
+
+restaurants.df <- st_paul_restaurant_sf.df$osm_points %>% 
+  janitor::clean_names() %>% 
+  filter(!is.na(amenity)) %>% 
+  dplyr::select(amenity, osm_id, name, shop, opening_hours, phone, website, geometry, `addr_city`, `addr_housenumber`, `addr_street`) %>% 
+  mutate(amenity = str_to_title(amenity) %>% as_factor())
+  
+head(restaurants.df)
+
+
+```
+
+
+```{r}
+#| label: stadiamaps-api
+
+register_stadiamaps(key = "fc6bfacf-f6bb-4d75-a921-e283b14b7b56", write=TRUE) 
+```
+
+```{r}
+#| label: fig-st-paul-gg
+#| fig-cap: "St paul ggmap"
+#| fig-cap-location: "top"
+
+
+st_paul_base.map <- get_map(location = st_paul, source = "stadia", maptype = "stamen_toner_lite")
+
+st_paul_base.gg <- ggmap(st_paul_base.map) + theme_void()
+
+st_paul_base.gg
+
+```
+
+
+```{r}
+#| label: fig-stpaul-restaurants-wip
+#| fig-cap: "St Paul Restaurants"
+#| fig-cap-location: "top"
+
+
+st_paul_base.gg +
+  geom_sf(data = restaurants.df,
+          aes(color = shop),
+          inherit.aes = FALSE) +
+  labs(title = "St. Paul, MN Restaurants") +
+  scale_color_viridis_d("Restaurant Type", option = "C")
+
+```
+
+
+```{r}
+#| label: fig-leaflet
+#| fig-cap: "Caption text here"
+#| fig-cap-location: "top"
+
+
+
+```
 
