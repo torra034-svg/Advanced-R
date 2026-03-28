@@ -18,7 +18,7 @@ library(tidycensus)
 library(osmdata)
 library(ggmap)
 library(leaflet)
-library(virdis, quietly = TRUE)
+library(viridis, quietly = TRUE)
 
 ```
 
@@ -232,10 +232,23 @@ st_paul_base.gg +
 
 ```{r}
 #| label: fig-leaflet
-#| fig-cap: "Caption text here"
+#| fig-cap: "St Paul Restaurant Leaflet"
 #| fig-cap-location: "top"
 
+pal <- colorFactor(palette = "viridis", domain = restaurants.df$shop)
 
-
+leaflet(data = st_paul_restaurant_sf.df$osm_points) %>% 
+  addProviderTiles('CartoDB.Positron') %>% 
+  addCircleMarkers(
+    color = ~pal(shop),
+    weight = 2,
+    radius = 4,
+    label = ~name
+  ) %>% 
+  addLegend(
+    pal = pal,
+    values = ~shop,
+    title = "Restaurant Type",
+    position = "bottomright")
 ```
 
