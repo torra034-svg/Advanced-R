@@ -1,0 +1,22 @@
+---
+title: "Week 10 Activity"
+author: "Patrick Torralba"
+format:
+  html:
+    theme: flatly
+    embed-resources: true
+    toc: true
+    smooth-scroll: true
+    number-sections: true 
+
+---
+
+# Step 0: Getting Ready
+```{r}
+#| label: library
+
+library(devtools)
+library(roxygen2)
+
+```
+

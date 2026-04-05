@@ -1,0 +1,11 @@
+Package: Temp
+Type: Package
+Title: Temperature Conversion Calculator
+Version: 0.0.0.9000
+Authors: Patrick Torralba
+Description: Converts temperature in Fahrenheit degrees to Celsius, and vice versa
+License: `use_mit_license()`, `use_gp13_license()`
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
