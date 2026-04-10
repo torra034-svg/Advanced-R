@@ -4,3 +4,113 @@ author: "Patrick Torralba"
 format: html
 editor: visual
 ---
+
+# Set-up
+```{r}
+library(tidyverse)
+```
+
+
+# Task 1
+
+```{r}
+
+new_clinic <- function(name, patient_count, wait_times) {
+  out <- list(
+    name = name,
+    patients = patient_count,
+    wait_times = wait_times,
+    timestamp = Sys.time()
+  )
+  
+  class(out) <- "clinic"
+  
+  return(out)
+}
+
+
+my_clinic <- new_clinic("Moos Tower Health", 45, c(12, 30, 5, 45, 20))
+
+class(my_clinic)
+
+
+
+```
+
+
+# Task 2
+
+```{r}
+
+print.clinic <- function(x, ...) {
+  cat("Institution: ", x$name, "\n")
+  cat("Current Patient Load: ", x$patients, "\n")
+  cat("Patients in Lobby: ", length(x$wait_times), "\n")
+  cat("Report Generated: ", as.character(x$timestamp), "\n")
+}
+
+my_clinic
+
+
+```
+
+# Task 3
+
+```{r}
+
+admit <- function(x, ...) {
+  UseMethod("admit")
+}
+
+admit.clinic <- function(x, wait_time = 0, ...) {
+  x$patients <- x$patients + 1
+  x$wait_times <- c(x$wait_times, wait_time)
+  return(x)
+}
+
+
+my_clinic <- admit(my_clinic, wait_time = 10)
+my_clinic
+
+
+```
+
+
+# Task 4
+
+```{r}
+
+summary.clinic <- function(object, ...) {
+  cat("--- Clinic Summary Report ---\n")
+  print(object)
+  avg_wait <- mean(object$wait_times)
+  cat("Average Lobby Wait: ", round(avg_wait, 1), "minutes\n")
+  cat("Recommended Staffing: ", ceiling(object$patients / 10), "units\n")
+}
+
+
+
+
+summary(my_clinic)
+
+
+
+
+```
+
+
+# Task 5
+
+```{r}
+plot.clinic <- function(object, ...) {
+  cat("--- Wait Times ---\n")
+  ggplot(data = object$data, aes(x = object$wait_times)) +
+    geom_histogram(bins = 10, fill = "blue") +
+    labs(x = "Wait Times (minutes)",
+         y = "Count",
+         title = paste("Distribution of Wait Times for", object$name))
+}
+
+plot(my_clinic)
+```
+
