@@ -1,0 +1,88 @@
+---
+title: "In-class-activity-PT"
+author: "Patrick Torralba"
+format: html
+editor: visual
+---
+
+```{r}
+
+library(shiny)
+library(ggplot2)
+library(pwr)
+
+# Define UI
+ui <- fluidPage(
+  titlePanel("Power Analysis Visualization"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      numericInput("n", "Sample Size (n):", value = 30, min = 2, step = 1),
+      numericInput("mu_alt", "True Population Mean (μ₁):", value = 0.5, step = 0.1),
+      numericInput("sd", "Population SD (σ):", value = 1, min = 0.1, step = 0.1),
+      sliderInput("alpha", "Significance Level (α):", min = 0.01, max = 0.20, value = 0.05, step = 0.01)
+    ),
+    
+    mainPanel(
+      h4("Calculated Power:"),
+      verbatimTextOutput("power_val"),
+      plotOutput("plotB"), # Showing raw data overlap first for intuition
+      plotOutput("plotA")  # Showing the sampling distribution
+    )
+  )
+)
+
+# Define Server Logic
+server <- function(input, output) {
+  
+  # Calculate effect size (Cohen's d)
+  eff_size <- reactive({ abs(input$mu_alt / input$sd) })
+  
+  # Calculate Power
+  pwr_obj <- reactive({
+    pwr.t.test(n = input$n, d = eff_size(), sig.level = input$alpha, 
+               type = "one.sample", alternative = "greater")
+  })
+  
+  output$power_val <- renderText({
+    paste0(round(pwr_obj()$power * 100, 2), "%")
+  })
+  
+  # Plot B: Raw Data Distributions
+  output$plotB <- renderPlot({
+    ggplot(data.frame(x = c(-4, 4 + input$mu_alt)), aes(x = x)) +
+      stat_function(fun = dnorm, args = list(mean = 0, sd = input$sd), aes(fill = "Null (μ=0)"), geom = "area", alpha = 0.3) +
+      stat_function(fun = dnorm, args = list(mean = input$mu_alt, sd = input$sd), aes(fill = "Alt"), geom = "area", alpha = 0.3) +
+      labs(title = "Plot B: Raw Population Distributions (Overlap)", x = "Value", y = "Density", fill = "Group") +
+      theme_minimal()
+  })
+  
+  # Plot A: Sampling Distributions (t-distribution)
+  output$plotA <- renderPlot({
+    df <- input$n - 1
+    # Critical t-value
+    t_crit <- qt(1 - input$alpha, df)
+    # Non-centrality parameter
+    ncp <- input$mu_alt / (input$sd / sqrt(input$n))
+    
+    p <- ggplot(data.frame(x = c(-4, ncp + 4)), aes(x = x)) +
+      # Null Distribution
+      stat_function(fun = dt, args = list(df = df), color = "black", size = 1) +
+      # Alternative Distribution (Non-central t)
+      stat_function(fun = dt, args = list(df = df, ncp = ncp), color = "blue", size = 1) +
+      # Shading Power
+      stat_function(fun = dt, args = list(df = df, ncp = ncp), 
+                    xlim = c(t_crit, ncp + 4), geom = "area", fill = "blue", alpha = 0.5) +
+      geom_vline(xintercept = t_crit, linetype = "dashed", color = "red") +
+      annotate("text", x = t_crit, y = 0.2, label = "Critical Value", angle = 90, vjust = -0.5, color = "red") +
+      labs(title = "Plot A: Test Statistic (Sampling Distribution)", x = "t-statistic", y = "Density") +
+      theme_minimal()
+    
+    print(p)
+  })
+}
+
+shinyApp(ui = ui, server = server)
+
+```
+
