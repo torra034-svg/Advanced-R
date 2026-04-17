@@ -1,0 +1,121 @@
+---
+title: "Week-12-Activity-Patrick-Torralba"
+author: "Patrick Torralba"
+format: html
+editor: visual
+---
+
+```{r}
+library(shiny)
+library(ggplot2)
+library(bslib)
+library(bsicons)
+```
+
+
+```{r}
+# UI Logic
+ui <- page_sidebar(
+  title = "Power of a One-Sample T-Test",
+  theme = bs_theme(version = 5, bootswatch = "flatly"),
+  
+  sidebar = sidebar(
+    title = "Parameters",
+    sliderInput("n", "Sample Size (n):", min = 2, max = 100, value = 30),
+    
+    # Tooltip for True Mean
+    layout_column_wrap(
+      width = 1,
+      sliderInput("mu_alt", "True Mean (Alternative μ):", min = 0, max = 5, value = 2, step = 0.1),
+      tooltip(
+        bs_icon("question-circle-fill", size = "1.2em"),
+        "The True Mean defines the shift from the Null (μ=0). A larger shift increases Power."
+      )
+    ),
+    
+    sliderInput("sd", "Standard Deviation (σ):", min = 0.5, max = 5, value = 1, step = 0.1),
+    sliderInput("alpha", "Significance Level (α):", min = 0.01, max = 0.2, value = 0.05, step = 0.01)
+  ),
+
+  # Main Panel
+  layout_columns(
+    fill = FALSE,
+    value_box(
+      title = "Statistical Power (1 - β)",
+      value = textOutput("power_val"),
+      showcase = bs_icon("lightning-fill"),
+      theme = "primary"
+    )
+  ),
+  
+  card(
+    full_screen = TRUE,
+    card_header("Distribution Visualization"),
+    plotOutput("power_plot")
+  )
+)
+```
+
+
+```{r}
+# Server Logic
+server <- function(input, output) {
+  
+  # Calculate Statistical Power
+  power_calc <- reactive({
+    # Standard Error
+    se <- input$sd / sqrt(input$n)
+    # Critical Value (one-tailed for simplicity in visualization)
+    z_crit <- qnorm(1 - input$alpha, mean = 0, sd = se)
+    # Power is the area under the alternative curve to the right of z_crit
+    pwr <- 1 - pnorm(z_crit, mean = input$mu_alt, sd = se)
+    return(list(pwr = pwr, z_crit = z_crit, se = se))
+  })
+
+  output$power_val <- renderText({
+    paste0(round(power_calc()$pwr * 100, 1), "%")
+  })
+
+  output$power_plot <- renderPlot({
+    res <- power_calc()
+    se <- res$se
+    z_crit <- res$z_crit
+    mu_a <- input$mu_alt
+    
+    # Define range for plot
+    x_min <- -3 * se
+    x_max <- mu_a + 4 * se
+    x <- seq(x_min, x_max, length.out = 500)
+    
+    # Dataframes for plotting
+    df_null <- data.frame(x = x, y = dnorm(x, mean = 0, sd = se))
+    df_alt <- data.frame(x = x, y = dnorm(x, mean = mu_a, sd = se))
+    
+    ggplot() +
+      # Null Distribution
+      geom_line(data = df_null, aes(x, y, color = "Null (μ=0)"), size = 1) +
+      # Alternative Distribution
+      geom_line(data = df_alt, aes(x, y, color = "Alt (True μ)"), size = 1) +
+      
+      # Shade Alpha (Critical Region)
+      geom_area(data = subset(df_null, x >= z_crit), aes(x, y, fill = "Alpha (Type I Error)"), alpha = 0.4) +
+      
+      # Shade Power
+      geom_area(data = subset(df_alt, x >= z_crit), aes(x, y, fill = "Power (1 - Beta)"), alpha = 0.4) +
+      
+      # Critical Value Line
+      geom_vline(xintercept = z_crit, linetype = "dashed", color = "red") +
+      annotate("text", x = z_crit, y = max(df_null$y), label = "Critical Value", angle = 90, vjust = -0.5) +
+      
+      labs(title = "Null vs. Alternative Hypothesis Distributions",
+           x = "Sample Mean", y = "Density", fill = "Regions", color = "Distributions") +
+      scale_fill_manual(values = c("Alpha (Type I Error)" = "#e74c3c", "Power (1 - Beta)" = "#2ecc71")) +
+      scale_color_manual(values = c("Null (μ=0)" = "#7f8c8d", "Alt (True μ)" = "#2980b9")) +
+      theme_minimal() +
+      theme(legend.position = "bottom")
+  })
+}
+
+shinyApp(ui, server)
+```
+
