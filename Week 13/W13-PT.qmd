@@ -1,0 +1,168 @@
+---
+title: "W13-PT"
+author: "Patrick Torralba"
+format: html
+editor: visual
+---
+
+# The Setup
+```{r}
+library(stats)
+set.seed(123)
+n <- 10000
+x <- runif(n, 0, 10)
+y <- 5 * exp(-0.5 * x) + rnorm(n, sd = 0.2)
+df <- data.frame(x, y)
+
+# Fit to simulated data, using starting values:
+start_vals <- list(a = 1, b = 1)
+fit <- nls(y ~ a * exp(-b * x), data = df, start = start_vals)
+a.est=summary(fit)$coefficients[1,1] #estimate for a
+b.est=summary(fit)$coefficients[2,1] #estimate for b
+```
+
+# Serial Execution
+```{r}
+# Number of bootstrap samples
+B <- 1000
+
+# Storage matrix
+boot_results <- matrix(NA, nrow = B, ncol = 2)
+colnames(boot_results) <- c("a", "b")
+
+# Time the serial loop
+serial_time <- system.time({
+
+for(i in 1:B){
+
+  # Bootstrap sample
+  index <- sample(1:nrow(df), replace = TRUE)
+  boot_df <- df[index, ]
+
+  # Fit model with tryCatch
+  result <- tryCatch({
+
+    fit_boot <- nls(
+      y ~ a * exp(-b * x),
+      data = boot_df,
+      start = list(a = a.est, b = b.est)
+    )
+
+    c(coef(fit_boot)["a"], coef(fit_boot)["b"])
+
+  }, error = function(e) {
+
+    c(NA, NA)
+
+  })
+
+  boot_results[i, ] <- result
+}
+
+})
+
+# View time
+serial_time
+
+# Convert to data frame
+boot_results <- as.data.frame(boot_results)
+
+# Look at first few rows
+head(boot_results)
+```
+
+
+
+# Parallel Execution
+```{r}
+library(doParallel)
+library(foreach)
+
+# Detect available cores
+n_cores <- parallel::detectCores()
+
+# Use one less than total cores
+registerDoParallel(cores = n_cores - 1)
+
+# Number of bootstrap samples
+B <- 1000
+
+# Time the parallel version
+parallel_time <- system.time({
+
+boot_parallel <- foreach(
+  i = 1:B,
+  .combine = rbind,
+  .packages = "stats"
+) %dopar% {
+
+  # Bootstrap sample
+  index <- sample(1:nrow(df), replace = TRUE)
+  boot_df <- df[index, ]
+
+  # Try fitting model
+  result <- tryCatch({
+
+    fit_boot <- nls(
+      y ~ a * exp(-b * x),
+      data = boot_df,
+      start = list(a = a.est, b = b.est)
+    )
+
+    c(
+      a = coef(fit_boot)["a"],
+      b = coef(fit_boot)["b"]
+    )
+
+  }, error = function(e) {
+
+    c(a = NA, b = NA)
+
+  })
+
+  result
+}
+
+})
+
+# Shut down workers
+stopImplicitCluster()
+
+# Convert to data frame
+boot_parallel <- as.data.frame(boot_parallel)
+
+# View time
+parallel_time
+
+# Preview results
+head(boot_parallel)
+```
+
+# 4) Plot the bootstrap results
+```{r}
+library(tidyverse)
+
+ggplot(boot_parallel, aes(x = a.a)) +
+  geom_histogram(bins = 30,
+                 fill = "blue",
+                 color = "white") +
+  labs(x = "a Estimate",
+       y = "Frequency",
+       title = "Bootstrap Estimates of a")
+```
+
+```{r}
+ggplot(boot_parallel, aes(x = b.b)) +
+  geom_histogram(bins = 30,
+                 fill = "red",
+                 color = "white") +
+  labs(x = "b Estimate",
+       y = "Frequency",
+       title = "Bootstrap Estimates of b")
+```
+
+
+
+# 5)
+
+Yes, the parallel approach was definitely faster than serial execution. Since bootstrap replications are independent tasks, they can be distributed across different cores. Therefore, this distribution reduces the total time.
